@@ -43,7 +43,7 @@ void testCase()
     sort(locs.begin(),locs.end());
     for(int i=n-1;i>0;i--)
     {
-        node<int> *tempNode = new node(locs[i]-locs[i-1]);
+        node<int> *tempNode = new node<int>(locs[i]-locs[i-1]);
         pq.push(tempNode);
         if(start==nullptr)
         {
