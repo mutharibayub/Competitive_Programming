@@ -56,17 +56,15 @@ void testCase()
             start = tempNode;
         }
     }
-
     vector<node<int>*> removedNodes;
     for(int i=0;i<(n-c);i++)
     {
-        node<int> *tempNode = pq.top();
-        pq.pop();
-        while(tempNode->valid==false)
+        while(pq.top()->valid==false)
         {
-            tempNode = pq.top();
             pq.pop();
         }
+        node<int> *tempNode = pq.top();
+        pq.pop();
         if(tempNode->back==nullptr || (tempNode->front!=nullptr && tempNode->back->val > tempNode->front->val))
         {
             tempNode->front->valid=false;
@@ -94,8 +92,10 @@ void testCase()
     cout<<ans<<'\n';
     for(auto it:removedNodes)
     {
+        // cout<<it->val<<'\t';
         delete it;
     }
+    // cout<<'\n';
     start = pq.top();
     while(start->back!=nullptr)
     {
@@ -103,6 +103,7 @@ void testCase()
     }
     while(start)
     {
+        // cout<<start->val<<'\t';
         node<int> *temp = start;
         start = start->front;
         delete temp;
@@ -111,6 +112,9 @@ void testCase()
 
 int main()
 {
+    ios_base::sync_with_stdio(0);
+    cin.tie();
+
     int n;
     cin>>n;
     while(n--)
