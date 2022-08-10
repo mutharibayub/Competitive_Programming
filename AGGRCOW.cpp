@@ -67,8 +67,10 @@ void testCase()
         pq.pop();
         if(tempNode->back==nullptr || (tempNode->front!=nullptr && tempNode->back->val > tempNode->front->val))
         {
+            cout<<tempNode->val<<" "<<tempNode->front->val;
             tempNode->front->valid=false;
             tempNode->val += tempNode->front->val;
+            cout<<" = "<<tempNode->val<<'\n';
             removedNodes.push_back(tempNode->front);
             tempNode->front = tempNode->front->front;
             if(tempNode->front)tempNode->front->back = tempNode;
@@ -76,8 +78,10 @@ void testCase()
         }
         else
         {
+            cout<<tempNode->val<<" "<<tempNode->back->val;
             tempNode->back->valid=false;
             tempNode->val += tempNode->back->val;
+            cout<<" = "<<tempNode->val<<'\n';
             removedNodes.push_back(tempNode->back);
             tempNode->back = tempNode->back->back;
             if(tempNode->back)tempNode->back->front = tempNode;
