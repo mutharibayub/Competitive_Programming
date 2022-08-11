@@ -22,33 +22,83 @@ class bigInt
         }
         return out;
     }
-public:
     vector<int> data;
-    
+public:
     bigInt(const string& str)
     {
         data.clear();
+        int mult=1;
         for(int i=str.size()-1;i>=0;i--)
         {
             if((str.size()-1-i)%9==0)
             {
                 data.push_back(0);
+                mult=1;
             }
-            data.back()*=10;
-            data.back()+=str[i]-'0';
+            data.back()+=(str[i]-'0')*mult;
+            mult*=10;
         }
+    }
+    bigInt operator-(const bigInt& obj)
+    {
+        bigInt temp = *this;
+        for(int i=0;i<temp.data.size() && i<obj.data.size();i++)
+        {
+            temp.data[i]-=obj.data[i];
+        }
+        for(int i=0;i<temp.data.size()-1;i++)
+        {
+            if(temp.data[i]<0)
+            {
+                temp.data[i]+=int(1e9);
+                temp.data[i+1]--;
+            }
+        }
+        while(temp.data.back()==0)temp.data.pop_back();
+        return temp;
+    }
+    bigInt operator+(const bigInt& obj)
+    {
+        bigInt temp = *this;
+        while(temp.data.size()<obj.data.size())temp.data.push_back(0);
+        int64_t carry = 0;
+        for(int i=0;i<temp.data.size();i++)
+        {
+            int64_t tempNum = temp.data[i];
+            tempNum += obj.data[i] + carry;
+            temp.data[i] = tempNum % int(1e9);
+            carry = tempNum / int(1e9);
+        }
+        if(carry)temp.data.push_back(0);
+        while(temp.data.back()==0)temp.data.pop_back();
+        return temp;
+    }
+    void divideBy2()
+    {
+        int carry = 0;
+        for(int i=this->data.size()-1;i>=0;i--)
+        {
+            int temp = this->data[i];
+            this->data[i] = (temp+carry*int(1e9))/2;
+            carry = temp%2;
+        }
+        while(this->data.back()==0)this->data.pop_back();
     }
     void print()
     {
-        for(int i=data.size()-1;i>=0;i--)
+        if(data.size()==0)cout<<'0';
+        else
         {
-            if(i)
+            for(int i=data.size()-1;i>=0;i--)
             {
-                cout<<intToString(data[i],9);
-            }
-            else
-            {
-                cout<<intToString(data[i],0);
+                if(i==data.size()-1)
+                {
+                    cout<<intToString(data[i],0);
+                }
+                else
+                {
+                    cout<<intToString(data[i],9);
+                }
             }
         }
     }
@@ -56,7 +106,18 @@ public:
 
 int main()
 {
-    bigInt a("123");
-    a.print();
-
+    for(int i=0;i<10;i++)
+    {
+        string a,b;
+        cin>>a>>b;
+        bigInt num1(a);
+        bigInt num2(b);
+        bigInt num3 = num1-num2;
+        num3.divideBy2();
+        num2 = num2 + num3;
+        num2.print();
+        cout<<'\n';
+        num3.print();
+        cout<<'\n';
+    }
 }

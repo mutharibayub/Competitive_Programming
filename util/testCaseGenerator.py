@@ -1,19 +1,21 @@
 import random
 import os
 
-def test_gen(stalls, cows):
-    stall_locs = set()
-    while len(stall_locs)<stalls:
-        stall_locs.add(str(random.randint(0,1000000000)))
-    return f"{stalls} {cows}\n{' '.join(list(stall_locs))}"
+def test_gen(lower_lim, upper_lim):
+    num1 = random.randint(lower_lim, upper_lim)
+    num2 = -1
+    while num2 == -1 or (num2-num1)%2==1:
+        num2 = random.randint(lower_lim, num1-1) 
+    return f"{num1} {num2}"
     
-test_cases = 100
+test_cases = 10
 
-test = str(test_cases)+"\n"
+# test = str(test_cases)+"\n"
+test = ""
 for i in range(test_cases):
-    stalls = random.randint(2,10)
-    cows = random.randint(2,stalls)
-    test += test_gen(stalls,cows) + "\n"
+    lower_lim = 0
+    upper_lim = int(1e10)
+    test += test_gen(lower_lim, upper_lim) + "\n"
 
 input_file = os.path.join(os.path.curdir, "outputCompare","input.txt")
 with open(input_file,'w') as f:
