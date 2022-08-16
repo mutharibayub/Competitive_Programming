@@ -13,157 +13,89 @@ stringstream output;
 stringstream input;
 
 //------------------------------------------------------------------------------------------------//
-template <class T>
-class node
+void add1(string& inp, int digitNum)
 {
-public:
-    T val;
-    bool valid;
-    node *back;
-    node *front;
-    node(T val, bool valid=true, node *back=nullptr, node *front=nullptr):val(val),valid(valid),back(back),front(front){}
-    bool operator<(const node& obj)
+    while(true)
     {
-        return this->val < obj.val;
+        inp[digitNum]++;
+        if(inp[digitNum]=='9'+1)
+        {
+            inp[digitNum]='0';
+            if(digitNum==inp.size()-1)
+            {
+                inp.push_back('1');
+                return;
+            }
+            digitNum++;
+        }
+        else
+        {
+            return;
+        }
     }
-};
-
-template<class T>
-class Compare
-{
-public:
-    bool operator() (const node<T>* obj1, const node<T>* obj2)
-    {
-        return obj1->val > obj2->val;
-    }
-};
+}
 
 void testCase()
 {
-    int n,c;
-    input>>n>>c;
-    node<int> *start=nullptr;
-    priority_queue<node<int>*, vector<node<int>*>, Compare<int>> pq;
-    vector<int> locs(n);
-    for(int i=0;i<n;i++)
+    string inp;
+    input>>inp;
+    reverse(inp.begin(), inp.end());
+    add1(inp, 0);
+    for(int i=0;i<inp.size();i++)
     {
-        input>>locs[i];
-    }
-    sort(locs.begin(),locs.end());
-    for(int i=n-1;i>0;i--)
-    {
-        node<int> *tempNode = new node<int>(locs[i]-locs[i-1]);
-        pq.push(tempNode);
-        if(start==nullptr)
+        if(inp[i] > '9' || (i<inp.size()/2 && inp[i] > inp[inp.size()-i-1]))
         {
-            start = tempNode;
+            if(i == inp.size()-1)
+            {
+                inp.push_back('1');
+                break;
+            }
+            else
+            {
+                inp[i+1]++;
+            }
+        }
+    }
+    bool start = false;
+    for(int i=inp.size()-1;i>=inp.size()/2;i--)
+    {
+        if(!start && inp[i]<='9')
+        {
+            inp[inp.size()-1-i] = inp[i];
         }
         else
         {
-            tempNode->front = start;
-            start->back = tempNode;
-            start = tempNode;
+            inp[i]='0';
+            inp[inp.size()-1-i] = inp[i];
         }
     }
-    vector<node<int>*> removedNodes;
-    for(int i=0;i<(n-c);i++)
-    {
-        while(pq.top()->valid==false)
-        {
-            pq.pop();
-        }
-        node<int> *tempNode = pq.top();
-        pq.pop();
-        if(tempNode->back==nullptr || (tempNode->front!=nullptr && tempNode->back->val > tempNode->front->val))
-        {
-            tempNode->front->valid=false;
-            tempNode->val += tempNode->front->val;
-            removedNodes.push_back(tempNode->front);
-            tempNode->front = tempNode->front->front;
-            if(tempNode->front)tempNode->front->back = tempNode;
-            pq.push(tempNode);
-        }
-        else
-        {
-            tempNode->back->valid=false;
-            tempNode->val += tempNode->back->val;
-            removedNodes.push_back(tempNode->back);
-            tempNode->back = tempNode->back->back;
-            if(tempNode->back)tempNode->back->front = tempNode;
-            pq.push(tempNode);
-        }
-    }
-    while(pq.top()->valid==false)
-    {
-        pq.pop();
-    }
-    int ans = pq.top()->val;
-    output<<ans<<'\n';
-    for(auto it:removedNodes)
-    {
-        // output<<it->val<<'\t';
-        delete it;
-    }
-    // output<<'\n';
-    start = pq.top();
-    while(start->back!=nullptr)
-    {
-        start = start->back;
-    }
-    while(start)
-    {
-        // output<<start->val<<'\t';
-        node<int> *temp = start;
-        start = start->front;
-        delete temp;
-    }
+    output<<inp<<'\n';
 }
 //------------------------------------------------------------------------------------------------//
 
-void getDistance(const vector<int>& locs, vector<int>& assigned, int& maxDist, int cowsLeft)
+bool isPalindrome(const string& inp)
 {
-    if(cowsLeft == 0)
+    for(int i=0;i<inp.size()/2;i++)
     {
-        int minDistLocal = INT_MAX;
-        for(int i=0;i<assigned.size()-1;i++)
+        if(inp[i]!=inp[inp.size()-i-1])
         {
-            int dist=locs[assigned[i+1]]-locs[assigned[i]];
-            minDistLocal = min(dist, minDistLocal);
-        }
-        maxDist = max(minDistLocal, maxDist);
-        // for(auto it:assigned)
-        // {
-        //     output<<it<<' ';
-        // }
-        // output<<": "<<minDistLocal;
-        // output<<'\n';
-    }
-    else
-    {
-        int assignmentStart = assigned.empty()?0:assigned.back()+1;
-        for(int i=assignmentStart;locs.size()-i>=cowsLeft;i++)
-        {
-            assigned.push_back(i);
-            getDistance(locs, assigned, maxDist, cowsLeft-1);
-            assigned.pop_back();
+            return false;
         }
     }
+    return true;
 }
 
 void testCase1()
 {
-    int n,c;
-    input>>n>>c;
-    vector<int> locs(n);
-    for(int i=0;i<n;i++)
+    string inp;
+    input>>inp;
+    reverse(inp.begin(),inp.end());
+    add1(inp, 0);
+    while(!isPalindrome(inp))
     {
-        input>>locs[i];
+        add1(inp, 0);
     }
-    sort(locs.begin(),locs.end());
-    vector<int> assigned;
-    int maxDist = INT_MIN;
-    getDistance(locs, assigned, maxDist, c);
-    output<<maxDist<<'\n';
+    output<<inp<<'\n';
 }
 
 string code1(string inp)

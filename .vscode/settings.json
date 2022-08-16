@@ -4,6 +4,7 @@
         "queue": "cpp",
         "fstream": "cpp",
         "vector": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "xutility": "cpp"
     }
 }
