@@ -3,6 +3,7 @@
         "xstring": "cpp",
         "queue": "cpp",
         "fstream": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "unordered_map": "cpp"
     }
 }
