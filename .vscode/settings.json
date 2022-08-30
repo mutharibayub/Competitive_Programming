@@ -5,6 +5,7 @@
         "fstream": "cpp",
         "vector": "cpp",
         "unordered_map": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "xiosbase": "cpp"
     }
 }
