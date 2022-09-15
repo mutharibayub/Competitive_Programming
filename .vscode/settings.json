@@ -7,6 +7,7 @@
         "unordered_map": "cpp",
         "xutility": "cpp",
         "xiosbase": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "cmath": "cpp"
     }
 }
