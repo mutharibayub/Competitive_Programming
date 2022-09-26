@@ -8,6 +8,7 @@
         "xutility": "cpp",
         "xiosbase": "cpp",
         "iostream": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "ostream": "cpp"
     }
 }
