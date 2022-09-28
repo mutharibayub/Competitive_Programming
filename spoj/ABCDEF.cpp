@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <unordered_set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -11,36 +11,30 @@ int main()
 
     int n;
     cin>>n;
-    vector<int> arr(n);
-    unordered_set<int> set;
+    vector<int64_t> arr(n);
     for(int i=0;i<n;i++)
     {
         cin>>arr[i];
-        set.insert(arr[i]);
     }
-    int64_t count = 0;
-    for(int a=0;a<n;a++)
+    unordered_map<int64_t, int64_t> c1,c2;
+    int64_t maxVal = -1;
+    for(int i=0;i<n;i++)
     {
-        for(int b=0;b<n;b++)
+        for(int j=0;j<n;j++)
         {
-            for(int c=0;c<n;c++)
+            for(int k=0;k<n;k++)
             {
-                for(int d=0;d<n;d++)
-                {
-                    if(arr[d] && (arr[a]*arr[b]+arr[c])%arr[d]==0)
-                    for(int e=0;e<n;e++)
-                    {
-                        if(set.find((arr[a]*arr[b]+arr[c])/arr[d]-arr[e])!=set.end())
-                        {
-                            count++;
-                        }
-                    }   
-                }   
-            }   
+                c1[arr[i]*arr[j]+arr[k]]++;
+                if(arr[k])
+                c2[(arr[i]+arr[j])*arr[k]]++;           
+            }
         }
-        cout << count << endl;
     }
-    cout << count << endl;
-
+    int64_t count=0;
+    for(auto it:c1)
+    {
+        count += it.second*c2[it.first];
+    }
+    cout << count << '\n';
     return 0;
 }
