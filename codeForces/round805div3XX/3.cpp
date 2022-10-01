@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -15,7 +15,8 @@ int main()
     {
         int n,k;
         cin>>n>>k;
-        map<int, pair<int,int>> indexes;
+        unordered_map<int, pair<int,int>> indexes;
+        indexes.reserve(n);
         for(int i=0;i<n;i++)
         {
             int tmp;
