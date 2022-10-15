@@ -8,35 +8,6 @@ using namespace std;
 
 class Solution {
 public:
-    bool hasCycle(vector<vector<int>> adjList, int n)
-    {
-        vector<int> arm;
-        vector<bool> inArm(n, false);
-        for(int start=0;start<n;start++)
-        {
-            arm.push_back(start);
-            inArm[start]=true;
-            while(arm.size())
-            {
-                int parent = arm.back();
-                if(adjList[parent].size())
-                {
-                    int child = adjList[parent].back();
-                    if(inArm[child])return true;
-                    arm.push_back(child);
-                    inArm[child]=true;
-                    adjList[parent].pop_back();
-                }
-                else
-                {
-                    inArm[arm.back()]=false;
-                    arm.pop_back();
-                }
-            }
-        }
-        return false;
-    }
-
     vector<vector<int>> buildMatrix(int k, vector<vector<int>>& rowConditions, vector<vector<int>>& colConditions) {
         vector<vector<int>> adjList1(k), adjList2(k);
         unordered_set<int> tmp;
@@ -57,32 +28,39 @@ public:
         {
             adjList2[it/400].push_back(it%400);
         }
+        tmp.clear();
+        
         vector<array<int,2>> coords(k);
+        vector<bool> inArm(k, false);
+        
         for(int c=0;c<2;c++)
         {
             auto &adjList = c?adjList2:adjList1;
-            if(hasCycle(adjList, k))return vector<vector<int>>();
             
             vector<array<int,2>> weights(k);
             for(int i=0;i<k;i++)weights[i]={0,i};
             
             for(int i=0;i<k;i++)
             {
-                vector<array<int,2>> stk;
-                stk.push_back({i,i});                
+                vector<int> stk;
+                inArm[i]=true;
+                stk.push_back(i);                
                 while(!stk.empty())
                 {
-                    int node = stk.back()[0];
-                    int parent = stk.back()[1];
-                    if(weights[node][0] || adjList[node].empty())
+                    int node = stk.back();
+                    if(adjList[node].size())
                     {
-                        if(node!=parent)weights[parent][0] = max(weights[parent][0], weights[node][0]+1);
-                        stk.pop_back();    
-                        continue;
+                        if(inArm[adjList[node].back()])return vector<vector<int>>();
+                        stk.push_back(adjList[node].back());
+                        inArm[adjList[node].back()]=true;
+                        adjList[node].pop_back();
                     }
-                    for(auto child:adjList[node])
+                    else
                     {
-                        stk.push_back({child, node});
+                        int w = weights[stk.back()][0];
+                        inArm[stk.back()]=false;
+                        stk.pop_back();
+                        if(stk.size())weights[stk.back()][0] = max(weights[stk.back()][0], w+1);
                     }
                 }
             }
