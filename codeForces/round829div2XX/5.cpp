@@ -50,14 +50,9 @@ int main()
         {
             j+=arr[i]==1;
         }
-        if(!j)
-        {
-            cout << 0 << '\n';
-            continue;
-        }
         
-        ll val = (1ll*n*(n-1))%MOD*getInv(2, MOD)%MOD;
-        for(int i=2;i<=j;i++)
+        ll val = 0;
+        for(int i=1;i<=j;i++)
         {
             ll tmp = ((1ll*n*(n-1))%MOD*getInv(2ll*i*i, MOD))%MOD;
             val = (val+tmp)%MOD;
