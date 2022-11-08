@@ -10,21 +10,32 @@ using namespace std;
 
 const ll MOD = 998244353;
 
-ll eulerTotient(ll num, ll max)
+ll coprimeCount(ll num, ll max)
 {
-    ll ans = max;
-    for(ll i=2;i*i<=num;i++)
+    vector<ll> pf;
+    for(int i=2;i*i<=num;i++)
     {
         if(num%i==0)
         {
-            while(num%i==0)
-            {
-                num/=i;    
-            }
-            ans-=ans/i;
+            pf.push_back(i);
+            while(num%i==0)num/=i;
         }
     }
-    if(num>1)ans-=ans/num;
+    if(num>1)pf.push_back(num);
+    int pfc = pf.size();
+    ll ans = 0;
+    for(int i=0;i<(1<<pfc);i++)
+    {
+        ll mul = 1;
+        for(int j=0;j<pfc;j++)
+        {
+            if(i&(1<<j))
+            {
+                mul*=-pf[j];
+            }
+        }
+        ans += max/mul;
+    }
     return ans;
 }
 
@@ -32,9 +43,6 @@ int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
-
-    cout << eulerTotient(30, 60) << '\n';
-    return 0;
 
     int t;
     cin>>t;
@@ -47,7 +55,6 @@ int main()
         ll ans = 1;
         for(int i=1;i<n;i++)
         {
-            // cout << arr[i-1] << ' ' << arr[i] << '\n';
             if(arr[i-1]%arr[i])
             {
                 ans = 0;
@@ -55,7 +62,7 @@ int main()
             }
             if(arr[i-1]!=arr[i])
             {
-                ans = (ans*(eulerTotient(arr[i-1]/arr[i], m/arr[i])))%MOD;
+                ans = (ans*(coprimeCount(arr[i-1]/arr[i], m/arr[i])))%MOD;
             }
             else 
             {
