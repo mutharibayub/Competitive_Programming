@@ -6,6 +6,26 @@ using namespace std;
 
 #define ll long long
 
+const int A = 1e6+1;
+const int N = 5e5+1;
+
+vector<int> divisors[A];
+vector<int> pos[A];
+int ind[A];
+
+void addDiv(int num)
+{
+    auto &arr = divisors[num];
+    for(int i=1;i*i<=num;i++)
+    {
+        if(num%i==0)
+        {
+            arr.push_back(i);
+            if(i*i!=num)arr.push_back(num/i);
+        }
+    }
+}
+
 int main()
 {
     ios_base::sync_with_stdio(0);
@@ -17,11 +37,8 @@ int main()
     {
         int n;
         cin>>n;
-        vector<int> arr(n), ind(n);
-        unordered_map<int, vector<int>> pos;
-        unordered_map<int, int> ind;
-        ind.reserve(n);
-        pos.reserve(n);
+        vector<int> arr(n);
+
         for(int i=0;i<n;i++)
         {
             cin>>arr[i];
@@ -31,7 +48,7 @@ int main()
         
         for(int i=n-1;i>=0;i--)
         {
-            while(stk.size() && arr[stk.back()] > arr[i])
+            while(stk.size() && arr[stk.back()] >= arr[i])
             {
                 stk.pop_back();
             }
@@ -42,7 +59,7 @@ int main()
 
         for(int i=n-1;i>=0;i--)
         {
-            while(stk.size() && arr[stk.back()] < arr[i])
+            while(stk.size() && arr[stk.back()] <= arr[i])
             {
                 stk.pop_back();
             }
@@ -53,7 +70,7 @@ int main()
 
         for(int i=0;i<n;i++)
         {
-            while(stk.size() && arr[stk.back()] <= arr[i])
+            while(stk.size() && arr[stk.back()] < arr[i])
             {
                 stk.pop_back();
             }
@@ -73,42 +90,38 @@ int main()
         }
         stk.clear();
 
-        for(int i=0;i<n;i++)
-        {
-            cout << arr[i] << ' ';
-        }cout << '\n';
-
-        for(int i=0;i<n;i++)
-        {
-            cout << less_right[i] << ' ';
-        }cout << '\n';
-
         int64_t count = 0;
 
         for(int i=0;i<n;i++)
         {
-            for(int num2=arr[i];num2<int(1e6+1);num2+=arr[i])
+            if(divisors[arr[i]].empty())addDiv(arr[i]);
+            for(auto &num2:divisors[arr[i]])
             {
                 if(ind[num2])
                 {
                     int j = pos[num2][ind[num2]-1];
-                    if(j > less_left[i] && i < more_right[j])
+                    if(j > more_left[i] && i < less_right[j])
                     {
-                        count += (j-max(more_left[j], less_left[i])) * 1LL * (min(more_right[j], less_right[i])-i);
+                        count += (j-max(less_left[j], more_left[i])) * 1LL * (min(less_right[j], more_right[i])-i);
                     }
                 }
-                if(ind[num2]<pos[num2].size())
+                if(pos[num2].size() && ind[num2]<pos[num2].size())
                 {   
                     int j = pos[num2][ind[num2]];
-                    if(j > less_right[i] && i < more_left[j])
+                    if(j < more_right[i] && i > less_left[j])
                     {
-                        count += (i-max(more_left[i], less_left[j])) * 1LL * (min(more_right[i], less_right[j])-j);
+                        count += (i-max({more_left[i], less_left[j], ind[num2]?pos[num2][ind[num2]-1]:-1})) * 1LL * (min(more_right[i], less_right[j])-j);
                     } 
                 }
             }
             ind[arr[i]]++;
         }
-
+        cout << count << '\n';
+        for(int i=0;i<n;i++)
+        {
+            pos[arr[i]].clear();
+            ind[arr[i]]=0;
+        }
     }
 
     return 0;
