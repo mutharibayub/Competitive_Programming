@@ -1,15 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <unordered_map>
+#include <deque>
 
 using namespace std;
 
 typedef long long ll;
 
 const int N = 1e5+1;
-
-ll dp[N];
 
 int main()
 {
@@ -28,8 +26,10 @@ int main()
             cin>>arr[i];
             arr[i]--;
         }
-        vector<int> cycleLengths;
+        vector<int> cycleCount(n+1,0);
         vector<bool> done(n, false);
+        vector<int> dp(n+1, 1e9+7);
+        
         for(int i=0;i<n;i++)
         {
             int n=arr[i];
@@ -40,21 +40,38 @@ int main()
                 n = arr[n];
                 len++;
             }
-            if(len)cycleLengths.push_back(len);
+            if(len)cycleCount[len]++;
         }
-        sort(cycleLengths.rbegin(), cycleLengths.rend());
-        vector<int> dp(n+1,1e9+7);
 
         dp[0]=-1;
-        for(int i=0;i<cycleLengths.size();i++)
+        vector<int> tmp;
+        for(int i=1;i<=n;i++)
         {
-            int len = cycleLengths[i];
-            for(int j=n;j>=0;j--)
+            if(!cycleCount[i])continue;
+            tmp=dp;
+            int len = i;
+            for(int j=0;j<len;j++)
             {
-                if(j+len>n)continue;
-                dp[j+len]=min(dp[j+len], dp[j]+1);
+                deque<int> dq;
+                for(int l=j;l<=n;l+=len)
+                {
+                    if((bool)dq.size())
+                    {
+                        dp[l]=min(tmp[l], tmp[dq.front()]+(l-dq.front())/len);
+                    }
+                    while((bool)dq.size() && (l-dq.front())/len>=cycleCount[len])
+                    {
+                        dq.pop_front();
+                    }
+                    while((bool)dq.size() && tmp[dq.back()]>tmp[l])
+                    {
+                        dq.pop_back();
+                    }
+                    dq.push_back(l);
+                }
             }
         }
+
         int minVal = 1e9+7;
         for(int i=n;i>=1;i--)
         {
