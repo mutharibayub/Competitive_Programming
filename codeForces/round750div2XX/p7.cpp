@@ -4,58 +4,51 @@
 #include <algorithm>
 using namespace std;
  
-#define maxVal 5000
- 
+const int maxVal = 8192;
+const int N = 5000+1;
+
+int xors[maxVal];
+vector<int> pos[N];
+
 int main()
 {
-    int lim=0;
-    while(1<<lim<maxVal)
+    for(int i=0;i<maxVal;i++)
     {
-        lim++;
+        xors[i]=1e9+7;
     }
-    lim = 1<<lim;
-    unordered_map<int,int> xors;
-    vector<int> ans;
-    xors[0]=1e9+7;
-    ans.push_back(0);
- 
+    xors[0]=-1;
+
     int n;
     cin>>n;
     vector<int> arr(n);
     for(int i=0;i<n;i++)
     {
-        cin>>arr[i];
+        int tmp;
+        cin>>tmp;
+        pos[tmp].push_back(i);
     }
-    int count=1;
-    for(int i=n-1;i>=0;i--)
+
+    for(int i=1;i<N;i++)
     {
-        for(auto it:xors)
+        if(pos[i].empty())continue;
+        for(int j=0;j<maxVal;j++)
         {
-            if(it.second>arr[i])
-            {
-                if(xors.find(it.first^arr[i])==xors.end())
-                {
-                    count++;
-                    ans.push_back(it.first^arr[i]);
-                }
-                xors[it.first^arr[i]]=max(xors[it.first^arr[i]],arr[i]);
-            }
-        }
-        if(xors.size()==lim)
-        {
-            break;
+            if(xors[j]==1e9+7)continue;
+            auto iter = lower_bound(pos[i].begin(), pos[i].end(), xors[j]);
+            if(iter==pos[i].end())continue;
+            xors[i^j] = min(xors[i^j], *iter);
         }
     }
-    cout<<ans.size()<<'\n';
-    sort(ans.begin(),ans.end());
-    for(int i=0;i<ans.size();i++)
+    int count = 0;
+    for(int i=0;i<maxVal;i++)count+=xors[i]!=1e9+7;
+    cout << count << '\n';
+    for(int i=0;i<maxVal;i++)
     {
-        if(i)
+        if(xors[i]!=1e9+7)
         {
-            cout<<' ';
+            cout << i << ' ';
         }
-        cout<<ans[i];
-    }cout<<'\n';
- 
+    }cout << '\n';
+
     return 0;
 }
