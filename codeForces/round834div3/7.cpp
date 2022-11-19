@@ -1,8 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <array>
-#include <set>
+#include <queue>
 
 using namespace std;
 
@@ -19,51 +18,47 @@ int main()
     {
         int n;
         cin>>n;
-        vector<int> arr(n/2), avlbl(n+1, -1), done(n+1, true);
-        vector<array<int,2>> sorted(n/2);
-        vector<vector<int>> rqrdArr;
-        vector<int> rqrd(n+1, -1);
+        vector<int> arr(n/2), loc(n+1,-1);
         for(int i=0;i<n/2;i++)
         {
             cin>>arr[i];
-            sorted[i]={arr[i], i};
         }
-        sort(sorted.begin(), sorted.end());
-        int num=1, count=0;
+        bool possible=true;
         for(int i=0;i<n/2;i++)
         {
-            while(num<sorted[i][0])
+            if(loc[arr[i]]!=-1)
             {
-                num++, count++;
+                possible=false;
+                break;
             }
-            done[num]=false;
-            avlbl[sorted[i][1]]=count;
-            num++;
+            loc[arr[i]]=i;
         }
-        for(int i=0;i<n/2;)
+        if(!possible){cout<<-1<<'\n';continue;}
+        priority_queue<int> pq;
+        vector<int> assignments(n/2,-1);
+        for(int i=n;i>=1;i--)
         {
-            rqrdArr.push_back({});
-            rqrdArr.back().push_back(sorted[i][1]);
-            i++;
-            while(i<n/2 && avlbl[sorted[i-1][1]]==avlbl[sorted[i][1]])
+            if(loc[i]<0)
             {
-                rqrdArr.back().push_back(sorted[i][1]);
-                i++;
+                if(pq.empty())
+                {
+                    possible=false;
+                    break;
+                }
+                assignments[pq.top()]=i;
+                pq.pop();
             }
-        }
-        for(int i=0;i<rqrdArr.size();i++)
+            else
+            {
+                pq.push(loc[i]);
+            }
+        } 
+        if(!possible){cout<<-1<<'\n';continue;}
+        for(int i=0;i<n/2;i++)
         {
-            rqrd[avlbl[rqrdArr[i][0]]]=i;
-        }
-        vector<int> assign(n/2, -1);
-        int num = 1;
-        int assigned=0;
-        int i=0;
-        while(num<n)
-        {
-            if(done[num])num++;
-            else if(rqrd[])
-        }
+            if(i)cout << ' ';
+            cout << assignments[i] << ' ' << arr[i];
+        }cout << '\n';
     }
 
 
