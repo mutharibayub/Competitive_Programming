@@ -5,14 +5,37 @@
 #include <set>
 #include <queue>
 #include <algorithm>
+#include <array>
 
 using namespace std; 
 
 typedef long long ll;
 
-ll getMax(ll a, ll b)
+inline ll getMax(ll a, ll b)
 {
     return max(a+b,abs(a-b)*2ll);
+}
+
+inline ll getSum(const array<ll,3> &a)
+{
+    return a[0]+a[1]+a[2];
+}
+
+array<ll,3> doOp(array<ll,3> a, int i, int j)
+{
+    ll n1=a[i],n2=a[j];
+    if(n1<n2)swap(n1,n2);
+    while(i<=j)
+    {
+        a[i]=n1-n2;
+        i++;
+    }
+    return a;
+}
+
+inline bool midPeak(const array<ll,3> &a)
+{
+    return a[1]>a[0]&&a[1]>a[2];
 }
 
 int main()
@@ -38,15 +61,32 @@ int main()
         }
         else if(n==3)
         {
-            ans=getMax(arr[0],arr[1])+arr[2];
-            ans=max(ans,arr[0]+getMax(arr[1],arr[2]));
-            ans=max(ans,max(arr[0],arr[2])*3);
-            ll lf=abs(arr[0]-arr[1]), rf=abs(arr[1]-arr[2]);
-            ans=max(ans,lf+getMax(lf,arr[2]));
-            ans=max(ans,rf+getMax(rf,arr[0]));
-            ans=max(ans,abs(arr[0]-arr[2])*3);
-            ans=max(ans,lf*3);
-            ans=max(ans,rf*3);
+            queue<array<ll,3>> q;
+            set<array<ll,3>> done;
+            done.insert({arr[0],arr[1],arr[2]});
+            q.push({arr[0],arr[1],arr[2]});
+            while(!q.empty())
+            {
+                array<ll,3> top=q.front();
+                q.pop();
+                bool midBig = midPeak(top);
+                ans=max(ans,getSum(top));
+                if(!midBig)
+                {
+                    ans=max(ans,max(top[0],top[2])*3);
+                    continue;
+                }
+                for(int i=0;i<3;i++)
+                {
+                    for(int j=i+1;j<3;j++)
+                    {
+                        array<ll,3> nxt=doOp(top,i,j);
+                        if(done.find(nxt)!=done.end())continue;
+                        done.insert(nxt);
+                        q.push(nxt);
+                    }
+                }    
+            }
         }
         else
         {
