@@ -1,10 +1,32 @@
 #include <iostream>
 #include <vector>
-#include <unordered_map>
-#include <queue>
+#include <map>
+#include <algorithm>
 #include <array>
 
 using namespace std;
+
+typedef long long ll;
+
+const int N = 1e5+1;
+vector<int> al[N];
+int parent[N];
+int depth[N];
+map<int,int> mp[N];
+int p[N];
+
+void dfs(int u)
+{
+    for(auto v:al[u])
+    {
+        if(parent[u]!=v)
+        {
+            parent[v]=u;
+            depth[v]=depth[u]+1;
+            dfs(v);
+        }
+    }
+}
 
 int main()
 {
@@ -13,91 +35,78 @@ int main()
 
     int n;
     cin>>n;
-    vector<vector<int>> colors(n);
     vector<int> color(n);
+    vector<int> colorCount(n+1,0);
+    vector<int> ans(n);
     for(int i=0;i<n;i++)
     {
-        int tmp;
-        cin>>tmp;
-        tmp--;
-        color[i]=tmp;
-        colors[tmp].push_back(i);
+        cin>>color[i];
+        colorCount[color[i]]++;
     }
-    vector<pair<int,int>> edges;
-    
-    vector<vector<int>> adjList(n);
+    for(int i=0;i<n;i++)p[i]=i;
+    vector<array<int,2>> edges;
     for(int i=0;i<n-1;i++)
     {
-        int a,b;
-        cin>>a>>b;
-        a--,b--;
-        edges.emplace_back(a,b);
-        adjList[a].push_back(b);
-        adjList[b].push_back(a);
+        int u,v;
+        cin>>u>>v;
+        u--,v--;
+        al[u].push_back(v);
+        al[v].push_back(u);
+        edges.push_back({u,v});
+    }
+    depth[0]=0;
+    for(int i=0;i<n;i++)parent[i]=-1;
+    dfs(0);
+
+    for(int i=0;i<n;i++)
+    {
+        ans[i]=colorCount[color[i]]-1;
+        if(ans[i])mp[i][color[i]]++;
+        p[i]=i;
     }
 
-    vector<int> depth(n,-1);
-    vector<int> parent(n);
-    
+    vector<array<int,2>> nodes(n);
+    for(int i=0;i<n;i++)nodes[i]={depth[i],i};
+    sort(nodes.rbegin(), nodes.rend());
+
+    for(int i=0;i<n-1;i++)
     {
-        vector<array<int,3>> stk;
-        stk.push_back({0,0,-1});
-        while(!stk.empty())
+        int depth = nodes[i][0];
+        int node = nodes[i][1];
+
+        int u=node;
+        int v=parent[node];
+        if(mp[p[u]].size()<mp[p[v]].size())
         {
-            array<int,3> tmp = stk.back();
-            stk.pop_back();
-            depth[tmp[0]]=tmp[1];
-            parent[tmp[0]]=tmp[2];
-            for(auto &it:adjList[tmp[0]])
+            swap(u,v);
+        }
+        ll newAns=ans[u];
+        for(auto c:mp[p[v]])
+        {
+            int color = c.first;
+            int cnt = c.second;
+            auto it = mp[p[u]].find(color);
+            if(it!=mp[p[u]].end()&&it->second)
             {
-                if(depth[it]==-1)
-                {
-                    stk.push_back({it, tmp[1]+1, tmp[0]});
-                }
+                int cl = it->first;
+                int clCnt = it->second;
+                newAns-=1ll*(colorCount[cl]-clCnt)*clCnt;
             }
+            int newCnt = (mp[p[u]][color]+=cnt);
+            if(newCnt==colorCount[color])mp[p[u]].erase(color);
+            else newAns+=1ll*(colorCount[color]-newCnt)*newCnt;
         }
+        p[v]=p[u];
+        ans[parent[node]]=newAns;
     }
 
-    unordered_map<int64_t, int64_t> counts;
-    counts.reserve(n-1);
-
-    for(int i=0;i<n;i++)
+    for(auto edge:edges)
     {
-        if(colors[i].size()<2)continue;
-        vector<int> found(n,0);
-        vector<bool> done(n,false);
-        priority_queue<array<int,2>, vector<array<int,2>>> pq;
-        for(auto &it:colors[i])
-        {
-            pq.push({depth[it], it});
-            found[it]=1;
-        }
-        while(!pq.empty())
-        {
-            array<int,2> top = pq.top();
-            pq.pop();
-            int node = top[1], dpth=top[0];
-            if(done[node])continue;
-            while(parent[node]!=-1 && dpth>=pq.top()[0] && colors[i].size()-found[node]>0)
-            {
-                counts[node*1e5+parent[node]] += found[node]*(colors[i].size()-found[node]);
-                found[parent[node]] = found[node]+found[parent[node]];
-                done[node]=true;
-                node = parent[node];
-                dpth = depth[node];
-            }   
-            if(parent[node]!=-1 && colors[i].size()-found[node]>0)pq.push({dpth, node});
-        }
-    }   
-    
-    vector<int> ans(n-1);
-    for(int i=0;i<n-1;i++)
-    {
-        ans[i] = max(counts[edges[i].first*1e5+edges[i].second], counts[edges[i].second*1e5+edges[i].first]);
-        if(i)cout << ' ';
-        cout << ans[i];
-    }cout << '\n';
-
+        int u=edge[0],v=edge[1];
+        if(parent[u]==v)swap(u,v);
+        cout << ans[v] << ' ';
+    }
+    cout<< endl;
 
     return 0;
 }
