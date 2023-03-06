@@ -1,10 +1,11 @@
 #include <iostream>
 #include <vector>
-#include <map>
 
 using namespace std;
 
 typedef long long ll;
+
+int cnts[1<<26];
 
 int main()
 {
@@ -15,42 +16,33 @@ int main()
     cin>>wc;
     vector<string> wds(wc);
     for(int i=0;i<wc;i++)cin>>wds[i];
-    map<pair<int,int>,int> counts;
+    vector<int> a(wc,0), b(wc,0);
     for(int i=0;i<wc;i++)
-    {
-        int mask=0;
-        vector<bool> in(26,false);
         for(int j=0;j<wds[i].size();j++)
         {
-            mask^=(1<<(wds[i][j]-'a'));
-            in[wds[i][j]-'a']=true;
+            a[i]|=(1<<(wds[i][j]-'a'));
+            b[i]^=(1<<(wds[i][j]-'a'));
         }
-        for(int j=0;j<26;j++)
-        {
-            if(!in[j])counts[{mask,j}]++;
-        }
-    }
+
     ll ans = 0;
-    for(int i=0;i<wc;i++)
+
+    for(int i=0;i<26;i++)
     {
-        int mask=0;
-        vector<bool> in(26,false);
-        for(int j=0;j<wds[i].size();j++)
+        for(int j=0;j<wc;j++)
         {
-            mask^=(1<<(wds[i][j]-'a'));
-            in[wds[i][j]-'a']=true;
-        }
-        int invMask=((1<<26)-1)^mask;
-        for(int j=0;j<26;j++)
-        {
-            if(!in[j])
+            if(!(a[j]&(1<<i)))
             {
-                int tmpMask = invMask^(1<<j);
-                ans+=counts[{tmpMask,j}];
+                cnts[b[j]]++;
+                ans += cnts[((1<<26)-1)^b[j]^(1<<i)];
             }
         }
-    }   
-    ans/=2;
+
+        for(int j=0;j<wc;j++)
+        {
+            if(!(a[j]&(1<<i)))cnts[b[j]]--;
+        }
+    }
+
     cout << ans << '\n';
 
 
