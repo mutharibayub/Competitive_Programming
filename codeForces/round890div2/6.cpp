@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <functional>
 #include <numeric>
+#include <bitset>
 
 using namespace std;
 
@@ -91,6 +92,39 @@ void dfs(int u, vector<vector<int>> &al, vector<int> &parent, vector<int> &count
     }
 }
 
+const int MAXN = 1e6+1;
+
+template<int len = 1>
+int subsetSum(vector<int> &cnts, int sm)
+{
+    if(len < sm/2+1)
+    {
+        return subsetSum<min(MAXN, len*2)>(cnts, sm);
+    }
+
+    bitset<len> dp;
+    
+    dp[0] = 1;
+    for(int i=0;i<cnts.size();i++)
+    {
+        for(int j=0;j<cnts[i];j++)
+        {
+            dp=dp|(dp<<i);
+        }
+    }
+
+    int val = -1;
+    for(int i=sm/2;i>=0;i--)
+    {
+        if(dp[i])
+        {
+            val=i;
+            break;
+        }
+    }
+    return val;
+}
+
 int main()
 {
     ios_base::sync_with_stdio(0);
@@ -137,33 +171,20 @@ int main()
                 }
                 else
                 {
-                    vector<int> cnts(sm/2, 0);
+                    vector<int> cnts(sm/2+1, 0);
                     for(auto num: nums)
                         cnts[num]++;
-                    vector<bool> dp(sm/2, 0);
-                    dp[0]=true;
-                    for(int cntOf=0;cntOf<sm/2;cntOf++)
+                    for(int cntOf=0;cntOf<=sm/2;cntOf++)
                     {
-                        if(!cnts[cntOf])continue;
-                        int transfer = max(cnts[cntOf]-2, 0) / 2;
+                        if(!cnts[cntOf])
+                            continue;
+                        int transfer = max(cnts[cntOf]-1, 0) / 2;
                         cnts[cntOf]-=2*transfer;
-                        if(cntOf*2<sm/2)cnts[cntOf*2]+=transfer;
-                        for(int j=0;j<cnts[cntOf];j++)
-                        {
-                            for(int k=sm/2-1-cntOf;k>=0;k--)
-                            {
-                                dp[k+cntOf]|=dp[k];
-                            }
-                        }
+                        if(cntOf*2<=sm/2)
+                            cnts[cntOf*2]+=transfer;
                     }
-                    for(int i=sm/2-1;i>=0;i--)
-                    {
-                        if(dp[i])
-                        {
-                            ans += 1ll*i*(sm-i);
-                            break;
-                        }
-                    }
+                    int val = subsetSum(cnts, sm);
+                    ans += 1ll*val*(sm-val);
                 }
             }
         }
