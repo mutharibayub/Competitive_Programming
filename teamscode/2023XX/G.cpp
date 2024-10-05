@@ -49,7 +49,7 @@ ll gcd(ll a, ll b)
     return b?gcd(b, a%b):a;
 }
 
-const int N = 1e5+1;
+const int N = 1000+1;
 const int MOD = 998244353;
 ll fact[N];
 ll factInv[N];
@@ -87,57 +87,25 @@ int getParent(vector<int> &parent, int u)
     }return parent[u];
 }
 
-pair<ll, pair<bool, int>> dfs(vector<vector<int>> &children, vector<int> &parent, vector<int> &a,
-                    vector<int> &b, vector<int> &c, int color, int u)
-{
-    if(color!=-1)a[u]=color;
-    pair<ll, pair<bool, int>> out = {0, {true, b[u]}};
-    out.first += (a[u]==b[u]?0:c[u]);
-    color = (color!=-1||a[u]!=b[u]?b[u]:-1);
-    bool sameColor = true;
-    ll childrenSum = 0;
-    for(auto v: children[u])
-    {
-        auto pr = dfs(children, parent, a, b, c, color, v);
-        childrenSum += pr.first;
-        if(!pr.second.first || pr.second.second!=b[u])sameColor=false;
-    }
-    if(sameColor&&out.first==0)childrenSum = min(childrenSum, (ll)c[u]);
-    out.first += childrenSum;
-    out.second = {sameColor, b[u]};
-    return out;
-}
-
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
 
-    initFact();
+    // initFact();
 
     int tttt=1;
     cin>>tttt;
     while(tttt--)
     {
-        int n;
-        cin>>n;
-        vector<vector<int>> children(n);
-        vector<int> parent(n);
-        parent[0]=-1;
-        for(int i=0;i<n-1;i++)
+        int x, y, z;
+        cin>>x>>y>>z;
+        if(x > y)
+            swap(x, y);
+        for(int i=30;i>=0;i--)
         {
-            int u;
-            cin>>u;
-            u--;
-            parent[i+1]=u;
-            children[u].push_back(i+1);
+            int mn = (1<<30)
         }
-        vector<int> a(n), b(n), c(n);
-        for(int i=0;i<n;i++)cin>>c[i];
-        for(int i=0;i<n;i++)cin>>a[i];
-        for(int i=0;i<n;i++)cin>>b[i]; 
-        auto ans = dfs(children, parent, a, b, c, -1, 0);
-        cout << ans.first << '\n';
     }
     return 0;
 }

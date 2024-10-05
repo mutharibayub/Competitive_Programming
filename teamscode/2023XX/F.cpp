@@ -100,42 +100,17 @@ int main()
     {
         int n;
         cin>>n;
-        vector<array<int, 4>> coords(n);
+        vector<int> arr(n);
+        for(int i=0;i<n;i++)
+            cin>>arr[i];
+        ll mn=0, mx=0;
         for(int i=0;i<n;i++)
         {
-            for(int j=0;j<4;j++)
-                cin>>coords[i][j];
+            ll tmn=min({mn+arr[i], mn*arr[i], mx+arr[i], mx*arr[i]});
+            ll tmx=max({mn+arr[i], mn*arr[i], mx+arr[i], mx*arr[i]});
+            mn=tmn, mx=tmx;
         }
-        map<int, array<int, 4>> prev;
-        ll sum=0;
-        for(int i=0;i<n;i++)
-        {
-            bool removed=true;
-            sum += 1ll*(coords[i][2]-coords[i][0])*(coords[i][3]-coords[i][1]);
-            while(removed)
-            {
-                removed=false;
-                int toRemove=-1;
-                for(auto [idx, box]: prev)
-                {
-                    if(box[2]<=coords[i][0]||coords[i][2]<=box[0])continue;
-                    if(box[1]>=coords[i][3]||box[3]<=coords[i][1])continue;
-                    sum -= 1ll*(box[2]-box[0])*(box[3]-box[1]);
-                    sum -= 1ll*(coords[i][2]-coords[i][0])*(coords[i][3]-coords[i][1]);
-                    coords[i][0]=min(coords[i][0], box[0]);
-                    coords[i][1]=min(coords[i][1], box[1]);
-                    coords[i][2]=max(coords[i][2], box[2]);
-                    coords[i][3]=max(coords[i][3], box[3]);
-                    sum += 1ll*(coords[i][2]-coords[i][0])*(coords[i][3]-coords[i][1]);
-                    toRemove=idx;
-                    removed=true;
-                    break;
-                }
-                if(removed)prev.erase(toRemove);
-            }
-            prev[i]=coords[i];
-            cout << sum << '\n';
-        }
+        cout << mx << '\n';
     }
     return 0;
 }
